@@ -1,0 +1,41 @@
+services:
+  powa-db:
+    image: powateam/powa-archivist-18:latest
+    container_name: lr3-powa-db
+    environment:
+      POSTGRES_DB: powa
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    command:
+      - postgres
+      - -c
+      - shared_preload_libraries=pg_stat_statements,pg_stat_kcache,pg_qualstats,pg_wait_sampling
+      - -c
+      - track_io_timing=on
+      - -c
+      - powa.coalesce=5
+    ports:
+      - "55432:5432"
+    volumes:
+      - powa-data:/var/lib/postgresql
+      - ./powa-init.sql:/docker-entrypoint-initdb.d/01-powa.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d powa"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  powa-web:
+    image: powateam/powa-web:latest
+    container_name: lr3-powa-web
+    depends_on:
+      powa-db:
+        condition: service_healthy
+    command: ["powa-web", "--config=/etc/powa-web.conf"]
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./powa-web.conf:/etc/powa-web.conf:ro
+
+volumes:
+  powa-data:

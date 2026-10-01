@@ -1,0 +1,26 @@
+Limit  (cost=3845.94..3846.19 rows=100 width=50) (actual time=34.853..34.865 rows=100.00 loops=1)
+  Buffers: shared hit=862
+  ->  Sort  (cost=3845.94..3870.94 rows=10000 width=50) (actual time=34.852..34.859 rows=100.00 loops=1)
+        Sort Key: (sum(o.amount)) DESC
+        Sort Method: top-N heapsort  Memory: 36kB
+        Buffers: shared hit=862
+        ->  HashAggregate  (cost=3338.75..3463.75 rows=10000 width=50) (actual time=31.475..33.947 rows=10000.00 loops=1)
+              Group Key: c.region, c.full_name
+              Batches: 1  Memory Usage: 4113kB
+              Buffers: shared hit=862
+              ->  Hash Join  (cost=299.00..2967.12 rows=49550 width=24) (actual time=1.124..18.887 rows=49319.00 loops=1)
+                    Hash Cond: (o.customer_id = c.customer_id)
+                    Buffers: shared hit=862
+                    ->  Seq Scan on lr3_orders o  (cost=0.00..2538.00 rows=49550 width=10) (actual time=0.005..11.966 rows=49319.00 loops=1)
+                          Filter: (created_at >= (now() - '180 days'::interval))
+                          Rows Removed by Filter: 50681
+                          Buffers: shared hit=788
+                    ->  Hash  (cost=174.00..174.00 rows=10000 width=22) (actual time=1.110..1.112 rows=10000.00 loops=1)
+                          Buckets: 16384  Batches: 1  Memory Usage: 675kB
+                          Buffers: shared hit=74
+                          ->  Seq Scan on lr3_customers c  (cost=0.00..174.00 rows=10000 width=22) (actual time=0.003..0.457 rows=10000.00 loops=1)
+                                Buffers: shared hit=74
+Planning:
+  Buffers: shared hit=19
+Planning Time: 0.176 ms
+Execution Time: 35.461 ms

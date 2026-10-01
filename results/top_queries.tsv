@@ -1,0 +1,11 @@
+queryid	calls	total_ms	avg_ms	rows	hit	read	query
+-2705450706192691923	39885	1191550.15	29.87	3988500	34380915	0	SELECT c.region, c.full_name, sum(o.amount) AS total_amount FROM lr3_customers AS c JOIN lr3_orders AS o ON o.customer_id = c.customer_id WHERE o.created_at >= now() - interval $1 
+8412032120650235643	39885	159382.37	4.00	39885	31429380	0	SELECT count(*) FROM lr3_orders WHERE status = $1
+2883854941843058479	39885	132001.14	3.31	398850	31429425	0	SELECT * FROM lr3_orders WHERE customer_id = $1 ORDER BY created_at DESC LIMIT $2
+5136086444045961572	15	8645.48	576.37	1500000	13522242	15	INSERT INTO lr3_orders (customer_id, status, amount, created_at) SELECT $1 + (n % $2), (ARRAY[$3 /*, ... */])[$4 + (n % $5)], round(($6 + random() * $7)::numeric, $8), now() - ((n 
+-1167356310701330104	76	2589.17	34.07	76	421291	2340	SELECT public.powa_take_snapshot($1)
+2857693096658113618	15	661.82	44.12	0	14132	11	ANALYZE lr3_orders
+4031882261468557939	14	462.17	33.01	0	12278	0	EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT) SELECT c.region, c.full_name, sum(o.amount) AS total_amount FROM lr3_customers AS c JOIN lr3_orders AS o ON o.customer_id = c.customer_id WH
+9136531278182188456	15	317.27	21.15	0	3549	30	ANALYZE lr3_customers
+8364779844276467776	15	306.83	20.46	150000	596808	15	INSERT INTO lr3_customers (full_name, region) SELECT $1 || n, (ARRAY[$2 /*, ... */])[$3 + (n % $4)] FROM generate_series($5, $6) AS numbers(n)
+7678732671071693776	1	267.01	267.01	0	152775	21	CREATE EXTENSION IF NOT EXISTS powa
